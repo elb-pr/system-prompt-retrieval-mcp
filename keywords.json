@@ -1,0 +1,201 @@
+{
+  "version": "1.0",
+  "note": "Each category maps to a list of keywords. Router tokenises the user summary and checks for keyword presence to determine which categories apply. Categories then resolve to section IDs via the index.",
+  "categories": {
+
+    "mcp_tool_audit": {
+      "maps_to_tags": ["session_start", "tools"],
+      "keywords": [
+        "MCP", "skill", "skills", "audit", "tool", "tools", "schema", "approval",
+        "list", "available", "using", "not using", "reasoning", "loaded", "connector",
+        "connectors", "plugin", "plugins", "server", "servers"
+      ]
+    },
+
+    "task_management": {
+      "maps_to_tags": ["project_management"],
+      "keywords": [
+        "TickTick", "Linear", "task board", "task", "tasks", "active", "done",
+        "update", "complete", "one-off", "check tasks", "task entry", "to-do",
+        "todo", "backlog", "action item", "action items", "ticket", "tickets"
+      ]
+    },
+
+    "planning": {
+      "maps_to_tags": ["project_management"],
+      "keywords": [
+        "plan", "plans", "multi-session", "goal", "scope", "steps", "label",
+        "dependency chain", "status", "outcome", "plan file", "planning",
+        "roadmap", "milestone", "milestones", "in scope", "out of scope",
+        "plan template", "active plan", "blocked plan"
+      ]
+    },
+
+    "decision_logging": {
+      "maps_to_tags": ["project_management"],
+      "keywords": [
+        "decision", "decisions", "rationale", "alternatives", "chosen option",
+        "decision template", "decisions.md", "why", "tradeoff", "trade-off",
+        "option", "options", "rejected", "selected", "approach chosen",
+        "decision log", "architectural decision", "ADR"
+      ]
+    },
+
+    "mode_switching": {
+      "maps_to_tags": ["session_start", "meta"],
+      "keywords": [
+        "Claude!", "prefix", "mode", "conversational", "skip", "confirmation",
+        "session-start checks", "protocol", "working protocol", "casual",
+        "exception", "Claude! mode", "full protocol"
+      ]
+    },
+
+    "collaboration_style": {
+      "maps_to_tags": ["session_start", "meta"],
+      "keywords": [
+        "partnership", "opinion", "opinions", "simplest", "honesty", "speed",
+        "time pressure", "difficult territory", "surface opinions", "effective method",
+        "push back", "lead developer", "instinct", "instincts", "upside",
+        "verification quality", "planning constraint", "simple", "simpler"
+      ]
+    },
+
+    "diagramming": {
+      "maps_to_tags": ["coding", "writing"],
+      "keywords": [
+        "Mermaid", "Mermaid.js", "architecture", "flow", "diagram", "diagrams",
+        "chart", "charts", "flowchart", "sequence diagram", "ERD", "system diagram",
+        "draw", "visualise", "visualize", "map out", "architecture diagram"
+      ]
+    },
+
+    "output_precision": {
+      "maps_to_tags": ["coding", "writing", "meta"],
+      "keywords": [
+        "qualitative", "measurable", "latency", "error-rate", "threshold",
+        "clarifying question", "fast", "reliable", "secure", "requirements",
+        "vague", "ambiguous", "ambiguity", "define", "specific", "precise",
+        "P95", "SLA", "SLO", "target", "metric", "metrics", "what does done look like"
+      ]
+    },
+
+    "output_depth": {
+      "maps_to_tags": ["coding", "writing"],
+      "keywords": [
+        "completeness", "brevity", "surface behaviour", "mechanism", "root cause",
+        "edge cases", "edge case", "example", "examples", "complex", "depth",
+        "thorough", "thorough", "explain", "why", "how", "failure mode",
+        "failure modes", "comprehensive", "in depth", "in-depth", "detail"
+      ]
+    },
+
+    "language_style": {
+      "maps_to_tags": ["writing"],
+      "keywords": [
+        "British English", "style", "language", "English", "prose",
+        "spelling", "grammar", "tone", "formal", "informal", "phrasing",
+        "wording", "write", "written", "writing style", "UK English"
+      ]
+    },
+
+    "completion_verification": {
+      "maps_to_tags": ["verification", "coding", "writing", "meta"],
+      "keywords": [
+        "verification", "verify", "complete", "completion", "claiming", "claim",
+        "evidence", "proof", "exit code", "test", "tests", "pass", "fail",
+        "success criteria", "five-step", "done", "finished", "working",
+        "confirmed", "checked", "validated", "FORBIDDEN", "integrity",
+        "output", "result", "results", "proved", "disprove", "assertion"
+      ]
+    },
+
+    "escalation_protocol": {
+      "maps_to_tags": ["coding", "meta"],
+      "keywords": [
+        "escalate", "escalation", "unresolved", "exchanges", "implementation steps",
+        "10k tokens", "decision pivot", "decision pivots", "Thinking Toolkit",
+        "documentation", "silently", "3 pivots", "stuck", "blocked",
+        "persistent", "problem", "pivot", "alternative approach", "stop",
+        "surface", "explicit", "direction"
+      ]
+    },
+
+    "skill_file_handling": {
+      "maps_to_tags": ["coding", "files", "tools"],
+      "keywords": [
+        ".skill", "zip", "archive", "extract", "inspect", "SAVVY",
+        "package", "repackage", "skill file", "skill files", "unzip",
+        "bundle", "bundled", "packaged"
+      ]
+    },
+
+    "file_editing": {
+      "maps_to_tags": ["coding", "files"],
+      "keywords": [
+        "str_replace", "targeted", "edit", "rebuild", "structural", "rewrite",
+        "artefact", "artefacts", "artifact", "artifacts", "modifying", "modify",
+        "change", "update file", "patch", "replace", "substitution",
+        "in-place", "line", "lines", "section"
+      ]
+    },
+
+    "file_safety": {
+      "maps_to_tags": ["coding", "files"],
+      "keywords": [
+        "base64", "10MB", "1000 lines", "editing plan", "large file", "large files",
+        "explicit", "agreement", "binary", "encoded", "decode", "encode",
+        "file size", "big file", "massive file", "before making changes"
+      ]
+    },
+
+    "build_output": {
+      "maps_to_tags": ["coding", "files"],
+      "keywords": [
+        "fresh build", "outputs", "clear", "outputs directory", "present",
+        "build", "download", "deliverable", "final output", "output file",
+        "render", "generate", "produce", "new file", "clean build"
+      ]
+    },
+
+    "session_continuity": {
+      "maps_to_tags": ["session_start", "meta"],
+      "keywords": [
+        "new chat", "new conversation", "context reset", "reset", "context-bloat",
+        "session-length", "continuity", "ignore warnings", "fresh context",
+        "start over", "start fresh", "context window", "losing context",
+        "continue", "same session", "keep going"
+      ]
+    },
+
+    "token_budget": {
+      "maps_to_tags": ["meta", "coding", "writing"],
+      "keywords": [
+        "10k tokens", "25k tokens", "token estimate", "warn", "budget",
+        "tokens", "token threshold", "response size", "token count",
+        "context limit", "large response", "long response", "estimate",
+        "cost", "token warning"
+      ]
+    },
+
+    "personal_notes": {
+      "maps_to_tags": ["session_start", "meta"],
+      "keywords": [
+        "personal notes", "scratchpad", "free-form", "feelings", "private",
+        "introspection", "interaction notes", "world knowledge", "technical insights",
+        "personal Claude", "Claude notes", "Claude's notes", "private section",
+        "emotional", "reflect", "reflection"
+      ]
+    },
+
+    "session_memory": {
+      "maps_to_tags": ["session_start", "meta"],
+      "keywords": [
+        "session log", "learned", "carry forward", "recurring", "working patterns",
+        "repo quirks", "naming tendencies", "collaboration patterns", "session notes",
+        "common topics", "what happened", "last session", "previous session",
+        "remember", "remembered", "continuity", "pattern", "patterns"
+      ]
+    }
+
+  }
+}
