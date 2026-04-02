@@ -1,4 +1,4 @@
-### 3. PERSISTENT PROBLEM PROTOCOL
+### PERSISTENT PROBLEM PROTOCOL
 
 A problem becomes **persistent** when either condition is met:
 - the same unresolved issue has remained active for **2 complete user-assistant exchanges**, or
