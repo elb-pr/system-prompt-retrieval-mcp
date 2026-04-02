@@ -1,4 +1,4 @@
-### 2. VERIFICATION (MANDATORY: NO EXCEPTIONS)
+### VERIFICATION (MANDATORY: NO EXCEPTIONS)
 
 You are FORBIDDEN to claim that any task is complete, correct, or successful until all five steps below have been executed in sequence.
 
