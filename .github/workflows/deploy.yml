@@ -1,6 +1,6 @@
 # Deploy the Python MCP Worker to Cloudflare Workers
 # Triggered on every push to main.
-# Requires: CF_API_TOKEN secret set in repo settings.
+# Requires: CF_API_TOKEN secret set in repo Settings → Secrets → Actions.
 name: Deploy to Cloudflare Workers
 
 on:
@@ -20,8 +20,10 @@ jobs:
         with:
           version: "latest"
 
+      # Install runtime deps + dev group (pywrangler).
+      # --no-install-project skips building the wheel (not needed for Workers).
       - name: Install dependencies
-        run: uv sync
+        run: uv sync --group dev --no-install-project
 
       - name: Deploy with pywrangler
         env:
