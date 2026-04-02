@@ -1,35 +1,31 @@
 """
 Progressive Claude System Prompt — MCP Server
 
-This server IS the instruction database. Claude's system prompt shrinks to:
-  "Every turn, call retrieve_instructions with a brief summary of the user's
-   message. Follow the returned instructions."
+Transports:
+  stdio            — local MCP / Claude Desktop (default)
+  streamable-http  — Cloudflare Python Workers remote MCP (POST /mcp)
 
-The server holds all instruction markdown files, the enriched chunk index,
-and the hybrid retriever. On each call it returns only the relevant
-instruction chunks with exact line spans and confidence scores.
-
-Transport: stdio (for local MCP) or SSE (for remote/Smithery deployment).
+NOTE: When running on Cloudflare Python Workers (Pyodide), all imports
+MUST be absolute. Relative imports (from .module import ...) are not
+supported in the flat Pyodide module scope.
 """
 
 from __future__ import annotations
 
 import json
 import os
-import sys
 from pathlib import Path
 
 from mcp.server.fastmcp import FastMCP
 
-# ── Resolve paths ────────────────────────────────────────────────────────────
+# ── Paths ────────────────────────────────────────────────────────────────
 
-# The server runs from the repo root
 BASE_DIR = os.environ.get(
     "INSTRUCTION_BASE_DIR",
     str(Path(__file__).resolve().parent.parent),
 )
 
-# ── Lazy-initialised globals ─────────────────────────────────────────────────
+# ── Lazy-initialised globals ───────────────────────────────────────────────
 
 _retriever = None
 _query_parser = None
@@ -37,29 +33,27 @@ _chunks = None
 
 
 def _init():
-    """Build the index and retriever on first call."""
+    """Build indexes on first call (idempotent). Absolute imports only."""
     global _retriever, _query_parser, _chunks
 
     if _retriever is not None:
         return
 
-    from .indexer import build_chunks
-    from .retriever import HybridRetriever
-    from .query_parser import QueryParser
+    # Absolute imports — required for Cloudflare Pyodide flat module scope.
+    import indexer
+    import retriever as retriever_mod
+    import query_parser as qp_mod
 
     keywords_path = os.path.join(BASE_DIR, "keywords.json")
 
-    _chunks = build_chunks(BASE_DIR)
-    # BM25 outperforms hybrid on this corpus (80% top-1, 100% recall@5).
-    # Hybrid architecture is preserved for when the corpus grows beyond
-    # ~50 chunks where vocabulary mismatch may become an issue.
+    _chunks = indexer.build_chunks(BASE_DIR)
     default_mode = os.environ.get("RETRIEVER_MODE", "bm25")
-    _retriever = HybridRetriever(mode=default_mode, fusion_method="rrf")
+    _retriever = retriever_mod.HybridRetriever(mode=default_mode, fusion_method="rrf")
     _retriever.index(_chunks)
-    _query_parser = QueryParser(keywords_path=keywords_path)
+    _query_parser = qp_mod.QueryParser(keywords_path=keywords_path)
 
 
-# ── MCP Server ───────────────────────────────────────────────────────────────
+# ── MCP Server ─────────────────────────────────────────────────────────────
 
 mcp = FastMCP(
     "progressive-system-prompt",
@@ -86,49 +80,25 @@ def retrieve_instructions(
     mode: str = "bm25",
     include_session_start: bool = False,
 ) -> str:
-    """
-    Retrieve relevant instruction chunks for a task summary.
-
-    Args:
-        task_summary: Brief natural-language description of what the user
-                      is asking for this turn. 1-3 sentences.
-        top_k: Number of instruction chunks to return. Default 5.
-        mode: Retrieval mode — "bm25" (default, best on current corpus),
-              "hybrid" (BM25+TF-IDF+RRF), or "tfidf" (semantic only).
-        include_session_start: If True, always include session_start
-                               tagged chunks regardless of relevance score.
-                               Set True on the first turn of a conversation.
-
-    Returns:
-        JSON string with ranked instruction chunks, each containing:
-          - chunk_id, file, section, line_start, line_end
-          - text (the actual instruction content)
-          - summary, tags, instruction_type
-          - score, confidence, rank
-    """
     _init()
 
-    # Parse the query
     parsed = _query_parser.parse(task_summary)
 
-    # Override retriever mode if requested
     if mode != _retriever.mode:
         _retriever.mode = mode
 
-    # Retrieve
     results = _retriever.retrieve(
         query=parsed.expanded_query,
         top_k=top_k,
         required_tags=parsed.matched_tags if parsed.matched_tags else None,
     )
 
-    # Optionally inject session_start chunks
     if include_session_start:
+        import retriever as retriever_mod
         result_ids = {r.chunk.chunk_id for r in results}
         for chunk in _chunks:
             if "session_start" in chunk.tags and chunk.chunk_id not in result_ids:
-                from .retriever import RetrievalResult
-                results.append(RetrievalResult(
+                results.append(retriever_mod.RetrievalResult(
                     chunk=chunk,
                     score=0.0,
                     rank=len(results) + 1,
@@ -136,7 +106,6 @@ def retrieve_instructions(
                     confidence="session_start",
                 ))
 
-    # Format response
     output = {
         "query": {
             "raw": parsed.raw,
@@ -176,28 +145,10 @@ def retrieve_instructions(
     name="get_instruction_lines",
     description=(
         "Fetch the raw text of a specific instruction file between "
-        "given line numbers. Use this when you need the exact source "
-        "text beyond what retrieve_instructions returned."
+        "given line numbers."
     ),
 )
-def get_instruction_lines(
-    file_path: str,
-    line_start: int,
-    line_end: int,
-) -> str:
-    """
-    Get raw instruction text from a file at specific lines.
-
-    Args:
-        file_path: Relative path from the instruction repo root
-                   (e.g. "communication/response-gate.md").
-        line_start: First line to include (1-indexed, inclusive).
-        line_end: Last line to include (1-indexed, inclusive).
-
-    Returns:
-        The raw text content of the specified line range,
-        or an error message if the file/lines don't exist.
-    """
+def get_instruction_lines(file_path: str, line_start: int, line_end: int) -> str:
     full_path = os.path.join(BASE_DIR, file_path)
 
     if not os.path.exists(full_path):
@@ -209,47 +160,27 @@ def get_instruction_lines(
     except Exception as e:
         return json.dumps({"error": f"Failed to read file: {e}"})
 
-    # Clamp to valid range
     start = max(0, line_start - 1)
     end = min(len(lines), line_end)
 
     if start >= len(lines):
-        return json.dumps({
-            "error": f"line_start {line_start} exceeds file length {len(lines)}"
-        })
-
-    text = "".join(lines[start:end])
+        return json.dumps({"error": f"line_start {line_start} exceeds file length {len(lines)}"})
 
     return json.dumps({
         "file": file_path,
         "line_start": line_start,
         "line_end": line_end,
         "total_lines_in_file": len(lines),
-        "text": text,
+        "text": "".join(lines[start:end]),
     }, indent=2)
 
 
 @mcp.tool(
     name="list_instruction_chunks",
-    description=(
-        "List all available instruction chunks in the index with their "
-        "IDs, sections, tags, and summaries. Useful for discovering "
-        "what instructions exist."
-    ),
+    description="List all available instruction chunks with IDs, sections, tags, and summaries.",
 )
-def list_instruction_chunks(
-    filter_tag: str = "",
-    filter_type: str = "",
-) -> str:
-    """
-    List all chunks, optionally filtered by tag or instruction_type.
-
-    Args:
-        filter_tag: Only return chunks with this tag (e.g. "coding", "verification").
-        filter_type: Only return chunks of this type (e.g. "procedure", "rule", "meta").
-    """
+def list_instruction_chunks(filter_tag: str = "", filter_type: str = "") -> str:
     _init()
-
     results = []
     for chunk in _chunks:
         if filter_tag and filter_tag not in chunk.tags:
@@ -266,43 +197,28 @@ def list_instruction_chunks(
             "instruction_type": chunk.instruction_type,
             "summary": chunk.summary,
         })
-
-    return json.dumps({
-        "total": len(results),
-        "filter_tag": filter_tag or None,
-        "filter_type": filter_type or None,
-        "chunks": results,
-    }, indent=2)
+    return json.dumps({"total": len(results), "filter_tag": filter_tag or None, "filter_type": filter_type or None, "chunks": results}, indent=2)
 
 
 @mcp.tool(
     name="retriever_diagnostics",
-    description=(
-        "Run diagnostic information about the retriever index. "
-        "Returns corpus stats, token counts, and index health."
-    ),
+    description="Diagnostic stats about the retriever index.",
 )
 def retriever_diagnostics() -> str:
-    """Return diagnostic stats about the retriever index."""
     _init()
-
     total_tokens = sum(c._token_count for c in _chunks)
     avg_tokens = total_tokens / len(_chunks) if _chunks else 0
-
     tag_dist: dict[str, int] = {}
     type_dist: dict[str, int] = {}
     for c in _chunks:
         for t in c.tags:
             tag_dist[t] = tag_dist.get(t, 0) + 1
         type_dist[c.instruction_type] = type_dist.get(c.instruction_type, 0) + 1
-
-    files = sorted(set(c.file for c in _chunks))
-
     return json.dumps({
         "total_chunks": len(_chunks),
         "total_tokens_indexed": total_tokens,
         "avg_tokens_per_chunk": round(avg_tokens, 1),
-        "files_indexed": files,
+        "files_indexed": sorted(set(c.file for c in _chunks)),
         "tag_distribution": tag_dist,
         "instruction_type_distribution": type_dist,
         "bm25_vocabulary_size": len(_retriever._bm25._idf),
@@ -310,17 +226,20 @@ def retriever_diagnostics() -> str:
     }, indent=2)
 
 
-# ── Entry point ──────────────────────────────────────────────────────────────
+# ── Entry points ─────────────────────────────────────────────────────────────
+
+def get_asgi_app():
+    """Return the FastMCP ASGI app for streamable-http. Used by entry.py."""
+    return mcp.http_app(path="/mcp")
+
 
 def main():
-    """Run the MCP server."""
     transport = os.environ.get("MCP_TRANSPORT", "stdio")
-
     if transport == "sse":
         mcp.settings.port = int(os.environ.get("MCP_PORT", "8080"))
         mcp.run(transport="sse")
     else:
-        mcp.run(transport="stdio")
+        mcp.run(transport=transport)
 
 
 if __name__ == "__main__":
