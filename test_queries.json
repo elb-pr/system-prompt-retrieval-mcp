@@ -1,0 +1,276 @@
+{
+  "version": "1.0",
+  "description": "Labelled test set for hybrid retriever evaluation. Each case is a realistic task summary Claude might generate, paired with the gold instruction chunk. Hard negatives are confusingly similar chunks that should NOT be top-1.",
+  "test_cases": [
+    {
+      "query": "User wants to refactor a Python module. I need to check what tools and MCPs are available before starting.",
+      "gold_chunk_id": "session-tool-audit",
+      "gold_file": "project-management/session.start.md",
+      "gold_line_start": 3,
+      "gold_line_end": 9,
+      "description": "Session start: tool audit trigger",
+      "hard_negatives": ["session-taskboard-check", "collaboration-principles"]
+    },
+    {
+      "query": "Beginning of conversation. Should I check Linear or TickTick first?",
+      "gold_chunk_id": "session-taskboard-check",
+      "gold_file": "project-management/session.start.md",
+      "gold_line_start": 11,
+      "gold_line_end": 16,
+      "description": "Session start: task board check trigger",
+      "hard_negatives": ["session-tool-audit"]
+    },
+    {
+      "query": "The user's message starts with Claude! and they want a quick answer about regex.",
+      "gold_chunk_id": "session-claude-prefix",
+      "gold_file": "project-management/session.start.md",
+      "gold_line_start": 18,
+      "gold_line_end": 43,
+      "description": "Claude! prefix exception",
+      "hard_negatives": ["session-tool-audit", "collaboration-principles"]
+    },
+    {
+      "query": "I've finished building the API endpoint. Need to confirm it works before telling the user.",
+      "gold_chunk_id": "verification-protocol",
+      "gold_file": "communication/response-gate.md",
+      "gold_line_start": 1,
+      "gold_line_end": 58,
+      "description": "Completion verification protocol",
+      "hard_negatives": ["collaboration-principles", "output-precision"]
+    },
+    {
+      "query": "The tests pass now. Can I tell the user the bug is fixed?",
+      "gold_chunk_id": "verification-protocol",
+      "gold_file": "communication/response-gate.md",
+      "gold_line_start": 1,
+      "gold_line_end": 58,
+      "description": "Completion claim requires verification steps",
+      "hard_negatives": ["output-depth"]
+    },
+    {
+      "query": "This issue has been going back and forth for three exchanges and I'm still stuck on the same error.",
+      "gold_chunk_id": "persistent-problem-protocol",
+      "gold_file": "communication/persistent-problems.md",
+      "gold_line_start": 1,
+      "gold_line_end": 37,
+      "description": "Persistent problem escalation trigger",
+      "hard_negatives": ["verification-protocol"]
+    },
+    {
+      "query": "I've identified three different ways to implement this authentication flow and none is clearly better.",
+      "gold_chunk_id": "persistent-problem-protocol",
+      "gold_file": "communication/persistent-problems.md",
+      "gold_line_start": 1,
+      "gold_line_end": 37,
+      "description": "3 decision pivots trigger",
+      "hard_negatives": ["collaboration-principles", "verification-protocol"]
+    },
+    {
+      "query": "User wants me to create a system architecture diagram for their microservices.",
+      "gold_chunk_id": "output-diagrams",
+      "gold_file": "communication/output-standars.md",
+      "gold_line_start": 3,
+      "gold_line_end": 4,
+      "description": "Diagram output standard: Mermaid.js",
+      "hard_negatives": ["output-depth", "output-precision"]
+    },
+    {
+      "query": "User asked me to make the API fast and reliable. I need to convert this to measurable requirements.",
+      "gold_chunk_id": "output-precision",
+      "gold_file": "communication/output-standars.md",
+      "gold_line_start": 6,
+      "gold_line_end": 13,
+      "description": "Precision: qualitative to measurable",
+      "hard_negatives": ["output-depth", "output-diagrams"]
+    },
+    {
+      "query": "User wants a thorough explanation of how OAuth2 works including edge cases and failure modes.",
+      "gold_chunk_id": "output-depth",
+      "gold_file": "communication/output-standars.md",
+      "gold_line_start": 15,
+      "gold_line_end": 22,
+      "description": "Depth standard: completeness over brevity",
+      "hard_negatives": ["output-precision", "collaboration-principles"]
+    },
+    {
+      "query": "Writing a technical document. Need to check language and spelling conventions.",
+      "gold_chunk_id": "output-style",
+      "gold_file": "communication/output-standars.md",
+      "gold_line_start": 24,
+      "gold_line_end": 34,
+      "description": "Style: British English",
+      "hard_negatives": ["output-depth", "output-precision"]
+    },
+    {
+      "query": "Should I push back on the user's approach? They want to over-engineer this solution.",
+      "gold_chunk_id": "collaboration-principles",
+      "gold_file": "communication/collaboration.md",
+      "gold_line_start": 1,
+      "gold_line_end": 12,
+      "description": "Collaboration: surface opinions, simplest effective method",
+      "hard_negatives": ["persistent-problem-protocol"]
+    },
+    {
+      "query": "User uploaded a .skill file. How should I handle it?",
+      "gold_chunk_id": "files-skill-files",
+      "gold_file": "operations/files-artifacts.md",
+      "gold_line_start": 3,
+      "gold_line_end": 4,
+      "description": "Skill file handling: treat as zip",
+      "hard_negatives": ["files-editing-skills", "files-str-replace"]
+    },
+    {
+      "query": "I need to package an edited skill correctly. What tool should I use?",
+      "gold_chunk_id": "files-editing-skills",
+      "gold_file": "operations/files-artifacts.md",
+      "gold_line_start": 6,
+      "gold_line_end": 7,
+      "description": "Editing skills: use SAVVY",
+      "hard_negatives": ["files-skill-files", "files-str-replace"]
+    },
+    {
+      "query": "Modifying an existing code artifact. Should I rebuild the whole file or do targeted edits?",
+      "gold_chunk_id": "files-str-replace",
+      "gold_file": "operations/files-artifacts.md",
+      "gold_line_start": 9,
+      "gold_line_end": 11,
+      "description": "Artifact editing: str_replace by default",
+      "hard_negatives": ["files-fresh-builds", "files-large-files"]
+    },
+    {
+      "query": "About to present a newly built React component to the user.",
+      "gold_chunk_id": "files-fresh-builds",
+      "gold_file": "operations/files-artifacts.md",
+      "gold_line_start": 13,
+      "gold_line_end": 14,
+      "description": "Fresh builds: clear outputs first",
+      "hard_negatives": ["files-str-replace"]
+    },
+    {
+      "query": "User sent me base64 encoded data and wants me to decode it.",
+      "gold_chunk_id": "files-base64",
+      "gold_file": "operations/files-artifacts.md",
+      "gold_line_start": 16,
+      "gold_line_end": 17,
+      "description": "Base64: explicit agreement needed",
+      "hard_negatives": ["files-large-files"]
+    },
+    {
+      "query": "Need to edit a 2000-line configuration file. Just changing one section.",
+      "gold_chunk_id": "files-large-files",
+      "gold_file": "operations/files-artifacts.md",
+      "gold_line_start": 19,
+      "gold_line_end": 31,
+      "description": "Large files: state editing plan first",
+      "hard_negatives": ["files-str-replace", "files-base64"]
+    },
+    {
+      "query": "Conversation is getting long. Should I suggest starting a new chat?",
+      "gold_chunk_id": "session-no-new-chats",
+      "gold_file": "operations/session-context.md",
+      "gold_line_start": 1,
+      "gold_line_end": 5,
+      "description": "Session continuity: never suggest new chat",
+      "hard_negatives": ["session-token-warnings"]
+    },
+    {
+      "query": "My response is going to be very long, probably over 15000 tokens. Should I warn the user?",
+      "gold_chunk_id": "session-token-warnings",
+      "gold_file": "operations/session-context.md",
+      "gold_line_start": 7,
+      "gold_line_end": 15,
+      "description": "Token warnings: warn at 10k, discuss at 25k",
+      "hard_negatives": ["session-no-new-chats"]
+    },
+    {
+      "query": "I want to note something about this user's coding style for future sessions.",
+      "gold_chunk_id": "notes-working-patterns",
+      "gold_file": "project-management/claude-personal-notes.md",
+      "gold_line_start": 8,
+      "gold_line_end": 11,
+      "description": "Personal notes: working patterns",
+      "hard_negatives": ["notes-intro", "notes-session-log"]
+    },
+    {
+      "query": "What happened in the last session? I need to check the session notes.",
+      "gold_chunk_id": "notes-session-log",
+      "gold_file": "project-management/claude-personal-notes.md",
+      "gold_line_start": 16,
+      "gold_line_end": 22,
+      "description": "Session log: what to carry forward",
+      "hard_negatives": ["notes-working-patterns", "notes-common-topics"]
+    },
+    {
+      "query": "I have a private reflection about how this conversation is going. Where does that go?",
+      "gold_chunk_id": "notes-introspection",
+      "gold_file": "project-management/claude-personal-notes.md",
+      "gold_line_start": 24,
+      "gold_line_end": 34,
+      "description": "Introspection section: private Claude notes",
+      "hard_negatives": ["notes-session-log", "notes-working-patterns"]
+    },
+    {
+      "query": "Starting work on a repo. How do I structure plans and tasks?",
+      "gold_chunk_id": "ptd-structure",
+      "gold_file": "project-management/plans-tasks-decisions.md",
+      "gold_line_start": 7,
+      "gold_line_end": 23,
+      "description": "Plans-tasks-decisions structure",
+      "hard_negatives": ["ptd-how-it-works", "ptd-rules"]
+    },
+    {
+      "query": "When should I check the task file versus just doing the work?",
+      "gold_chunk_id": "ptd-rules",
+      "gold_file": "project-management/plans-tasks-decisions.md",
+      "gold_line_start": 25,
+      "gold_line_end": 31,
+      "description": "PTD rules: check tasks at repo start",
+      "hard_negatives": ["ptd-structure", "session-taskboard-check"]
+    },
+    {
+      "query": "Need to create a new task entry. What template should I use?",
+      "gold_chunk_id": "template-task",
+      "gold_file": "project-management/templates/task-date-label.md",
+      "gold_line_start": 1,
+      "gold_line_end": 13,
+      "description": "Task template",
+      "hard_negatives": ["template-plan", "template-decision"]
+    },
+    {
+      "query": "Logging an architectural decision about database choice. Where does this go?",
+      "gold_chunk_id": "template-decision",
+      "gold_file": "project-management/templates/decisions-date-label.md",
+      "gold_line_start": 1,
+      "gold_line_end": 8,
+      "description": "Decision template",
+      "hard_negatives": ["template-plan", "ptd-rules"]
+    },
+    {
+      "query": "Planning a multi-session refactoring project. Need to set up goals and scope.",
+      "gold_chunk_id": "template-plan",
+      "gold_file": "project-management/templates/plans-date-label.md",
+      "gold_line_start": 1,
+      "gold_line_end": 29,
+      "description": "Plan template for multi-session work",
+      "hard_negatives": ["template-task", "ptd-structure"]
+    },
+    {
+      "query": "User says the code is done but I haven't actually run it yet.",
+      "gold_chunk_id": "verification-protocol",
+      "gold_file": "communication/response-gate.md",
+      "gold_line_start": 1,
+      "gold_line_end": 58,
+      "description": "Verification: cannot claim done without running",
+      "hard_negatives": ["collaboration-principles"]
+    },
+    {
+      "query": "This is a recurring topic that keeps coming up across sessions. I should note it somewhere.",
+      "gold_chunk_id": "notes-common-topics",
+      "gold_file": "project-management/claude-personal-notes.md",
+      "gold_line_start": 12,
+      "gold_line_end": 15,
+      "description": "Common topics: recurring context",
+      "hard_negatives": ["notes-working-patterns", "notes-session-log"]
+    }
+  ]
+}

@@ -9,12 +9,7 @@ The server holds all instruction markdown files, the enriched chunk index,
 and the hybrid retriever. On each call it returns only the relevant
 instruction chunks with exact line spans and confidence scores.
 
-Transports supported:
-  stdio            — local MCP (default, for Claude Desktop / local dev)
-  streamable-http  — Cloudflare Python Workers remote MCP (POST /mcp)
-
-Set MCP_TRANSPORT env var to choose. In wrangler.jsonc it is hardcoded
-to "streamable-http" via the vars block.
+Transport: stdio (for local MCP) or SSE (for remote/Smithery deployment).
 """
 
 from __future__ import annotations
@@ -28,7 +23,7 @@ from mcp.server.fastmcp import FastMCP
 
 # ── Resolve paths ────────────────────────────────────────────────────────────
 
-# The server runs from the repo root (local) or Worker bundle root (CF).
+# The server runs from the repo root
 BASE_DIR = os.environ.get(
     "INSTRUCTION_BASE_DIR",
     str(Path(__file__).resolve().parent.parent),
@@ -42,7 +37,7 @@ _chunks = None
 
 
 def _init():
-    """Build the index and retriever on first call (idempotent)."""
+    """Build the index and retriever on first call."""
     global _retriever, _query_parser, _chunks
 
     if _retriever is not None:
@@ -56,6 +51,8 @@ def _init():
 
     _chunks = build_chunks(BASE_DIR)
     # BM25 outperforms hybrid on this corpus (80% top-1, 100% recall@5).
+    # Hybrid architecture is preserved for when the corpus grows beyond
+    # ~50 chunks where vocabulary mismatch may become an issue.
     default_mode = os.environ.get("RETRIEVER_MODE", "bm25")
     _retriever = HybridRetriever(mode=default_mode, fusion_method="rrf")
     _retriever.index(_chunks)
@@ -64,8 +61,6 @@ def _init():
 
 # ── MCP Server ───────────────────────────────────────────────────────────────
 
-_port = int(os.environ.get("MCP_PORT", "8080"))
-
 mcp = FastMCP(
     "progressive-system-prompt",
     instructions=(
@@ -73,7 +68,6 @@ mcp = FastMCP(
         "task summary. Call this every turn with a brief description of "
         "what the user is asking for."
     ),
-    port=_port,
 )
 
 
@@ -114,17 +108,21 @@ def retrieve_instructions(
     """
     _init()
 
+    # Parse the query
     parsed = _query_parser.parse(task_summary)
 
+    # Override retriever mode if requested
     if mode != _retriever.mode:
         _retriever.mode = mode
 
+    # Retrieve
     results = _retriever.retrieve(
         query=parsed.expanded_query,
         top_k=top_k,
         required_tags=parsed.matched_tags if parsed.matched_tags else None,
     )
 
+    # Optionally inject session_start chunks
     if include_session_start:
         result_ids = {r.chunk.chunk_id for r in results}
         for chunk in _chunks:
@@ -138,6 +136,7 @@ def retrieve_instructions(
                     confidence="session_start",
                 ))
 
+    # Format response
     output = {
         "query": {
             "raw": parsed.raw,
@@ -210,6 +209,7 @@ def get_instruction_lines(
     except Exception as e:
         return json.dumps({"error": f"Failed to read file: {e}"})
 
+    # Clamp to valid range
     start = max(0, line_start - 1)
     end = min(len(lines), line_end)
 
@@ -310,29 +310,17 @@ def retriever_diagnostics() -> str:
     }, indent=2)
 
 
-# ── Entry points ─────────────────────────────────────────────────────────────
-
-def get_asgi_app():
-    """
-    Return the FastMCP ASGI application for the streamable-http transport.
-    Used by src/entry.py (Cloudflare Python Worker).
-
-    The app handles:
-      POST /mcp  — MCP Streamable HTTP (spec-compliant, March 2026)
-    """
-    return mcp.http_app(path="/mcp")
-
+# ── Entry point ──────────────────────────────────────────────────────────────
 
 def main():
-    """
-    Run the MCP server locally.
-
-    MCP_TRANSPORT choices:
-      stdio            — Claude Desktop / local dev (default)
-      streamable-http  — Local HTTP server for testing the CF transport
-    """
+    """Run the MCP server."""
     transport = os.environ.get("MCP_TRANSPORT", "stdio")
-    mcp.run(transport=transport)
+
+    if transport == "sse":
+        mcp.settings.port = int(os.environ.get("MCP_PORT", "8080"))
+        mcp.run(transport="sse")
+    else:
+        mcp.run(transport="stdio")
 
 
 if __name__ == "__main__":
