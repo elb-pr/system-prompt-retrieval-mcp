@@ -83,7 +83,7 @@ mcp = FastMCP(
 def retrieve_instructions(
     task_summary: str,
     top_k: int = 5,
-    mode: str = "hybrid",
+    mode: str = "bm25",
     include_session_start: bool = False,
 ) -> str:
     """
@@ -93,8 +93,8 @@ def retrieve_instructions(
         task_summary: Brief natural-language description of what the user
                       is asking for this turn. 1-3 sentences.
         top_k: Number of instruction chunks to return. Default 5.
-        mode: Retrieval mode — "hybrid" (default, most robust),
-              "bm25" (fast lexical only), or "tfidf" (semantic only).
+        mode: Retrieval mode — "bm25" (default, best on current corpus),
+              "hybrid" (BM25+TF-IDF+RRF), or "tfidf" (semantic only).
         include_session_start: If True, always include session_start
                                tagged chunks regardless of relevance score.
                                Set True on the first turn of a conversation.
