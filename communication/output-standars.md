@@ -1,4 +1,4 @@
-### 5. OUTPUT STANDARDS
+### OUTPUT STANDARDS
 
 **Diagrams**
 Use Mermaid.js for all architecture and flow diagrams.
