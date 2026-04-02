@@ -1,4 +1,4 @@
-### 6. SESSION AND CONTEXT RULES
+### SESSION AND CONTEXT RULES
 
 Continue within the current session. Do not recommend starting a new chat, moving to a new conversation, or resetting context.
 
