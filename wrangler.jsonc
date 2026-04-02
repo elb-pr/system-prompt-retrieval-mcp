@@ -1,0 +1,27 @@
+// Cloudflare Python Worker — Progressive Claude System Prompt MCP
+// Transport: Streamable HTTP on /mcp (MCP spec, March 2026)
+// Runtime: Cloudflare Python Workers (open beta)
+// Deploy: uv run pywrangler deploy
+{
+  "name": "progressive-claude-system-prompt-mcp",
+  "main": "src/entry.py",
+  "compatibility_date": "2025-04-01",
+  "compatibility_flags": ["python_workers"],
+
+  // Environment variables — MCP_TRANSPORT is fixed to streamable-http
+  // for this deployment. Override RETRIEVER_MODE if needed.
+  "vars": {
+    "MCP_TRANSPORT": "streamable-http",
+    "RETRIEVER_MODE": "bm25",
+    // The Worker serves files from the bundle; set this to the
+    // directory where index.json / keywords.json / markdown dirs
+    // are bundled relative to the Worker root.
+    "INSTRUCTION_BASE_DIR": "/"
+  },
+
+  // Bundle all instruction content (markdown dirs + JSON indexes)
+  // as static assets so they are available at runtime.
+  "rules": [
+    { "type": "Data", "globs": ["**/*.json", "**/*.md"], "fallthrough": true }
+  ]
+}
