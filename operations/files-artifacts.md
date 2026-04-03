@@ -32,27 +32,21 @@ I will use a targeted `str_replace` edit because the requested change affects on
 
 ---
 
-**Index maintenance**
-When a `.md` file is added to or removed from the repo, three things must stay in sync.
+**update_index**
+REQUIRED when adding or removing a `.md` file from this repo.
 
-**Adding a file:**
+**Adding a file — all three steps MUST be completed before pushing:**
 
-1. Add one or more entries to the `sections` array in `index.json`:
+1. Add an entry to `index.json` → `sections` array:
 ```json
-{
-  "id": "unique-kebab-id",
-  "file": "path/from/repo/root.md",
-  "lines": [1, 20],
-  "heading": "Section heading",
-  "tags": ["coding", "files"],
-  "description": "One-sentence summary used for retrieval scoring."
-}
+{ "id": "unique-kebab-id", "file": "path/from/root.md", "lines": [1, 20],
+  "heading": "Section heading", "tags": ["tag"], "description": "One-sentence retrieval summary." }
 ```
-2. Add an import to `worker.js` alongside the other markdown imports:
-`import _myFile from './path/from/repo/root.md';`
-3. Add it to the `FILES` registry in `worker.js`:
-`'path/from/repo/root.md': _myFile,`
+2. Add an import to `worker.js` with the other markdown imports:
+`import _name from './path/from/root.md';`
+3. Add to the `FILES` object in `worker.js`:
+`'path/from/root.md': _name,`
 
 **Removing a file:** delete its `sections` entries from `index.json` and remove its `import` and `FILES` entry from `worker.js`.
 
-Push — Cloudflare rebuilds automatically. No other steps needed.
+Push once — Cloudflare rebuilds automatically.

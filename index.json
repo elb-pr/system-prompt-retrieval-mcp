@@ -132,10 +132,10 @@
     {
       "id": "files-index-maintenance",
       "file": "operations/files-artifacts.md",
-      "lines": [35, 58],
-      "heading": "Index maintenance",
-      "tags": ["coding", "files"],
-      "description": "How to add or remove a markdown file from the repo: update index.json sections, add import and FILES entry to worker.js, then push."
+      "lines": [35, 53],
+      "heading": "update_index",
+      "tags": ["index_maintenance"],
+      "description": "update_index: steps to add or remove a markdown file from the repo — index.json entry, worker.js import, FILES registry. All three required before pushing."
     },
     {
       "id": "session-no-new-chats",

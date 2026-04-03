@@ -195,6 +195,14 @@
         "common topics", "what happened", "last session", "previous session",
         "remember", "remembered", "continuity", "pattern", "patterns"
       ]
+    },
+
+    "index_maintenance": {
+      "maps_to_tags": ["index_maintenance"],
+      "keywords": [
+        "update_index", "add file", "remove file", "new instruction file",
+        "new knowledge file", "register file", "index new"
+      ]
     }
 
   }
