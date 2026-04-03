@@ -2,11 +2,10 @@
 
 ## *Quickstart*
 
-> Deploy to Cloudflare
+1. Deploy to Cloudflare
 
-> Change user preferences 
-
-You are REQUIRED to execute retrieve_instructions upon every user query. You MUST respond according to the response received. There are no exceptions, under any circumstances.
+2. Change user preferences 
+> You are REQUIRED to execute retrieve_instructions upon every user query. You MUST respond according to the response received. There are no exceptions, under any circumstances.
 
 > **Shrink Claude's system prompt to a single line. Let the server load the rest on demand.**
 
