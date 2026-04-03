@@ -1,6 +1,6 @@
 # System Prompt Retrieval MCP
 
-## System Prompts or Otherwise - Fully Remote HTTP.
+## System Prompts or Otherwise - Remote HTTP.
 
 You can essentially now have a system prompt of any size you like. Your could inline skills, entire books. Anything really. 
 
