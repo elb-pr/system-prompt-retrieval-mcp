@@ -1,16 +1,3 @@
-"""
-Cloudflare Python Worker entrypoint.
-
-Bridges the Cloudflare Workers fetch event to FastMCP's ASGI app,
-exposing the MCP Streamable HTTP transport on POST /mcp.
-
-NOTE: Cloudflare Python Workers (Pyodide) load every .py file as a
-flat top-level module. Relative imports (from .server import ...) are
-not supported. All imports MUST be absolute.
-
-Architecture:
-  Cloudflare edge  -->  on_fetch()  -->  FastMCP ASGI app  -->  POST /mcp
-"""
 
 from __future__ import annotations
 
