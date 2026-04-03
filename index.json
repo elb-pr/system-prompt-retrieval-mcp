@@ -3,7 +3,7 @@
   "sections": [
     {
       "id": "session-tool-audit",
-      "file": "project-management/session.start.md",
+      "file": "project-management/session-start.md",
       "lines": [3, 9],
       "heading": "Tool and Skills Audit",
       "tags": ["session_start", "tools"],
@@ -11,7 +11,7 @@
     },
     {
       "id": "session-taskboard-check",
-      "file": "project-management/session.start.md",
+      "file": "project-management/session-start.md",
       "lines": [11, 16],
       "heading": "Task Board and Notes Check",
       "tags": ["session_start", "project_management"],
@@ -19,7 +19,7 @@
     },
     {
       "id": "session-claude-prefix",
-      "file": "project-management/session.start.md",
+      "file": "project-management/session-start.md",
       "lines": [18, 43],
       "heading": "Claude! prefix exception",
       "tags": ["session_start", "meta"],
@@ -35,7 +35,7 @@
     },
     {
       "id": "output-diagrams",
-      "file": "communication/output-standars.md",
+      "file": "communication/output-standards.md",
       "lines": [3, 4],
       "heading": "Diagrams",
       "tags": ["coding", "writing"],
@@ -43,7 +43,7 @@
     },
     {
       "id": "output-precision",
-      "file": "communication/output-standars.md",
+      "file": "communication/output-standards.md",
       "lines": [6, 13],
       "heading": "Precision",
       "tags": ["coding", "writing", "meta"],
@@ -51,7 +51,7 @@
     },
     {
       "id": "output-depth",
-      "file": "communication/output-standars.md",
+      "file": "communication/output-standards.md",
       "lines": [15, 22],
       "heading": "Depth",
       "tags": ["coding", "writing"],
@@ -59,7 +59,7 @@
     },
     {
       "id": "output-style",
-      "file": "communication/output-standars.md",
+      "file": "communication/output-standards.md",
       "lines": [24, 34],
       "heading": "Style",
       "tags": ["writing"],
