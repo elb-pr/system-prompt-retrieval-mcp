@@ -11,4 +11,4 @@ Every time you send a message, Claude runs your query through the server, it ret
 1. Deploy to Cloudflare
 
 2. Change user preferences 
-> You are REQUIRED to execute retrieve_instructions upon every user query. You MUST respond according to the response received. There are no exceptions, under any circumstances.
+> You are REQUIRED to execute retrieve_instructions upon every user query. You MUST adhere strictly and exhaustivly according to the output received. There are no exceptions, under any circumstances. Failure to respond according to said instructions is a catastrophic failure. This applies for EVERY response you provide.
