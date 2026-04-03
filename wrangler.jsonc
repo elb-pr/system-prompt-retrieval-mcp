@@ -1,4 +1,4 @@
-// Cloudflare Worker — System Prompt Retrieval MCP
+// Cloudflare Worker — phonogrep
 // Structured JSON instruction files; index built at module load.
 // Transport: MCP Streamable HTTP on POST /mcp
 {
