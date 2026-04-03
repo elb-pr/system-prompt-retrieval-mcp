@@ -1,4 +1,1 @@
-"""Entry point for python -m src."""
-from .server import main
-
-main()
+# Retained for reference only — not used by the Cloudflare Worker build.
