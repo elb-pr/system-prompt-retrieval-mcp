@@ -130,6 +130,14 @@
       "description": "Files over 10MB or 1000 lines require an editing plan stated before making any changes."
     },
     {
+      "id": "files-index-maintenance",
+      "file": "operations/files-artifacts.md",
+      "lines": [35, 58],
+      "heading": "Index maintenance",
+      "tags": ["coding", "files"],
+      "description": "How to add or remove a markdown file from the repo: update index.json sections, add import and FILES entry to worker.js, then push."
+    },
+    {
       "id": "session-no-new-chats",
       "file": "operations/session-context.md",
       "lines": [1, 5],

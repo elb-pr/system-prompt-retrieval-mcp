@@ -31,3 +31,28 @@ I will use a targeted `str_replace` edit because the requested change affects on
 </example>
 
 ---
+
+**Index maintenance**
+When a `.md` file is added to or removed from the repo, three things must stay in sync.
+
+**Adding a file:**
+
+1. Add one or more entries to the `sections` array in `index.json`:
+```json
+{
+  "id": "unique-kebab-id",
+  "file": "path/from/repo/root.md",
+  "lines": [1, 20],
+  "heading": "Section heading",
+  "tags": ["coding", "files"],
+  "description": "One-sentence summary used for retrieval scoring."
+}
+```
+2. Add an import to `worker.js` alongside the other markdown imports:
+`import _myFile from './path/from/repo/root.md';`
+3. Add it to the `FILES` registry in `worker.js`:
+`'path/from/repo/root.md': _myFile,`
+
+**Removing a file:** delete its `sections` entries from `index.json` and remove its `import` and `FILES` entry from `worker.js`.
+
+Push — Cloudflare rebuilds automatically. No other steps needed.
